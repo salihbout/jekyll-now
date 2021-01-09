@@ -1,0 +1,235 @@
+I"�<p>In this tutorial, we will design and implement a deep learning model that learns to recognize digits from sign language. We will be using a convolution neural network built using Keras API and trained on the <a href="https://github.com/ardamavi/Sign-Language-Digits-Dataset">Turkey Ankara Ayrancı Anadolu High School’s Sign Language Digits Dataset</a>. Many thanks to Arda Mavi for sharing this dataset.</p>
+
+<h2 id="introduction">Introduction</h2>
+<p>Convolutional Neural Networks (or CNNs) are one of the most famous deep learning models. It’s widely used in computer vision, and other deep learning tasks. In fact, Using CNNs is a clever way to reduce the number of parameters. Instead of training a fully connected network, a CNN reuses the same parameter multiple times. Thus, it’s a practical approach to reduce the amount of training time. Over a short period of time, CNNs become the state-of-the-art results in multiple domains, from text to speech going well beyond the initial image processing domain where they were originally conceived.</p>
+
+<h3 id="how-cnn-works">How CNN works?</h3>
+<p>The most important building blocks in a CNN are convolutional layers and filters. the input data passes through the convolutions and then it will be convolved with filters. This architecture allows the network to detect low-level features in the first hidden layers then assemble them into higher-level features in the next hidden layers. This hierarchical approach is commonly used in the real world imagery problems.</p>
+
+<p><img src="/img/posts/sign-cnn/cnn-overview.png" alt="cnn overview" /></p>
+
+<h2 id="lets-build-it-up">Let’s build it up!</h2>
+<p>First, we import the necessary tools.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kn">from</span> <span class="nn">keras</span> <span class="kn">import</span> <span class="n">backend</span> <span class="k">as</span> <span class="n">K</span>
+    <span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+    <span class="kn">from</span> <span class="nn">keras.layers.convolutional</span> <span class="kn">import</span> <span class="n">Conv2D</span>
+    <span class="kn">from</span> <span class="nn">keras.layers.convolutional</span> <span class="kn">import</span> <span class="n">MaxPooling2D</span>
+    <span class="kn">from</span> <span class="nn">keras.layers.core</span> <span class="kn">import</span> <span class="n">Activation</span><span class="p">,</span> <span class="n">Flatten</span><span class="p">,</span> <span class="n">Dropout</span><span class="p">,</span> <span class="n">Dense</span>
+    <span class="kn">from</span> <span class="nn">keras.utils</span> <span class="kn">import</span> <span class="n">np_utils</span>
+    <span class="kn">from</span> <span class="nn">keras.optimizers</span> <span class="kn">import</span> <span class="n">SGD</span><span class="p">,</span> <span class="n">RMSprop</span><span class="p">,</span> <span class="n">Adam</span>
+    <span class="kn">from</span> <span class="nn">keras.preprocessing.image</span> <span class="kn">import</span> <span class="n">ImageDataGenerator</span>
+    <span class="kn">from</span> <span class="nn">keras</span> <span class="kn">import</span> <span class="n">callbacks</span>
+    <span class="kn">import</span> <span class="nn">glob</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+    <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="n">path</span>
+    <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">misc</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span> 
+</code></pre></div></div>
+<p>We set some matplotlib configuration for better display of graphs.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s">'figure.figsize'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+</code></pre></div></div>
+<h2 id="details-of-datasets">Details of datasets</h2>
+<ul>
+  <li>Image size: 100 x 100 pixels</li>
+  <li>Image size: 100 x 100 pixels</li>
+  <li>Color space: RGB</li>
+  <li>Number of classes: 10 (Digits: 0-9)</li>
+  <li>Number of participant students: 218</li>
+  <li>Number of samples per student: 1</li>
+</ul>
+
+<p>We structure our dataset in two main folders, one for the training set and one for the validation set. each folder has subfolders named with the digit represented by the img within it, from 0 to 9. the split the whole dataset with a ratio of 20/80. 80% for training and 20% for validation.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">train_data_path</span> <span class="o">=</span> <span class="s">'Dataset/train'</span>
+    <span class="n">validation_data_path</span> <span class="o">=</span> <span class="s">'Dataset/validation'</span>
+</code></pre></div></div>
+
+<p>Let’s show one example from each subfolder, which represent a specific sign digit. We loop through the subfolders and plot the first image.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">figure</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+      <span class="n">IMAGE_PATH</span> <span class="o">=</span> <span class="n">train_data_path</span><span class="o">+</span><span class="s">'/'</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+      <span class="n">file_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="p">.</span><span class="n">glob</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">IMAGE_PATH</span><span class="p">,</span> <span class="s">'*.jpg'</span><span class="p">))</span>
+      <span class="n">image</span> <span class="o">=</span> <span class="n">misc</span><span class="p">.</span><span class="n">imread</span><span class="p">(</span><span class="n">file_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+      <span class="n">figure</span><span class="p">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+      <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p>The following figure shows the different samples of each digit:</p>
+
+<p><img src="/img/posts/sign-cnn/preview-sign.png" alt="cnn overview" /></p>
+
+<p>Our dataset is ready to feed the hunger of our deep learning model. But wait ! you might be wondering why we did do any data preprocessing? That’s a fundamental question in machine learning pipelines, however, we will be using a very useful class in Keras called <a href="https://keras.io/preprocessing/image/">ImageDataGenerator</a>. It will take care of normalizing our data and also generating batches of image data with real-time data augmentation(image processing). The latter concept will allow us to have more training data to improve the performance of our model.</p>
+
+<h2 id="deep-cnn-model">Deep CNN Model</h2>
+
+<p>Let’s prepare our model’s parameters ! if you are familiar with deep learning terminologies, you will easily understand the purpose of each variable from its name.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">img_width</span><span class="p">,</span> <span class="n">img_height</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span> 
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">samples_per_epoch</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">validation_steps</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="n">nb_filters1</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">nb_filters2</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">conv1_size</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">conv2_size</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">pool_size</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">classes_num</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="mf">0.001</span>
+</code></pre></div></div>
+
+<p>For this project, We will be using a deep CNN, it’s defined as the following sequence of blocks:</p>
+
+<p><strong>Convolution =&gt; Relu activation =&gt; Convolution =&gt; Relu activation =&gt; Max Pooling =&gt; Dropout =&gt; Convolution =&gt; Relu activation =&gt; Convolution =&gt; Relu activation =&gt; Max Pooling =&gt; Dropout =&gt; Flatten =&gt; Dense =&gt; Relu activation =&gt; Dropout =&gt; Dense</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">class</span> <span class="nc">CNN</span><span class="p">:</span>
+        <span class="o">@</span><span class="nb">staticmethod</span>
+        <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="n">classes</span><span class="p">):</span>
+
+                  <span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">))</span>
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Activation</span><span class="p">(</span><span class="s">'relu'</span><span class="p">))</span>
+
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">))</span>
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Activation</span><span class="p">(</span><span class="s">'relu'</span><span class="p">))</span>
+
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">MaxPooling2D</span><span class="p">(</span><span class="n">pool_size</span><span class="o">=</span><span class="p">(</span><span class="n">pool_size</span><span class="p">,</span><span class="n">pool_size</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span>
+
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.25</span><span class="p">))</span>
+
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">))</span>
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Activation</span><span class="p">(</span><span class="s">'relu'</span><span class="p">))</span>
+
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">))</span>
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Activation</span><span class="p">(</span><span class="s">'relu'</span><span class="p">))</span>
+
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">MaxPooling2D</span><span class="p">(</span><span class="n">pool_size</span><span class="o">=</span><span class="p">(</span><span class="n">pool_size</span><span class="p">,</span><span class="n">pool_size</span><span class="p">)))</span>
+
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.25</span><span class="p">))</span>
+
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Flatten</span><span class="p">())</span>
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">512</span><span class="p">))</span>
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Activation</span><span class="p">(</span><span class="s">'relu'</span><span class="p">))</span>
+
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.25</span><span class="p">))</span>
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">classes</span><span class="p">))</span>
+                  <span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Activation</span><span class="p">(</span><span class="s">'softmax'</span><span class="p">))</span>
+
+                  <span class="k">return</span> <span class="n">model</span>
+</code></pre></div></div>
+
+<p>The previous class create our deep learning and make it ready to be compiled.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">model</span> <span class="o">=</span> <span class="n">CNN</span><span class="p">.</span><span class="n">build</span><span class="p">((</span><span class="n">img_width</span><span class="p">,</span> <span class="n">img_height</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span><span class="n">classes_num</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">RMSprop</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">),</span>
+    <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+</code></pre></div></div>
+<p>Keras API gives us the possibility to take a look at a summary of our model and have an idea about the number of our trainable parameters.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="/img/posts/sign-cnn/summary.PNG" alt="keras summary" /></p>
+
+<p>Yaay, The model is ready! Let’s unleash the power of CNN. Time to prepare our data generators.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">train_datagen</span> <span class="o">=</span> <span class="n">ImageDataGenerator</span><span class="p">(</span><span class="n">rescale</span><span class="o">=</span><span class="mf">1.</span> <span class="o">/</span> <span class="mi">255</span><span class="p">,</span> <span class="n">shear_range</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">zoom_range</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+    <span class="n">train_generator</span> <span class="o">=</span> <span class="n">train_datagen</span><span class="p">.</span><span class="n">flow_from_directory</span><span class="p">(</span> <span class="n">train_data_path</span><span class="p">,</span> <span class="n">target_size</span><span class="o">=</span><span class="p">(</span><span class="n">img_height</span><span class="p">,</span> <span class="n">img_width</span><span class="p">),</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">class_mode</span><span class="o">=</span><span class="s">'categorical'</span><span class="p">)</span>
+</code></pre></div></div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">test_datagen</span> <span class="o">=</span> <span class="n">ImageDataGenerator</span><span class="p">(</span><span class="n">rescale</span><span class="o">=</span><span class="mf">1.</span> <span class="o">/</span> <span class="mi">255</span><span class="p">)</span>
+  <span class="n">validation_generator</span> <span class="o">=</span> <span class="n">test_datagen</span><span class="p">.</span><span class="n">flow_from_directory</span><span class="p">(</span><span class="n">validation_data_path</span><span class="p">,</span> <span class="n">target_size</span><span class="o">=</span><span class="p">(</span><span class="n">img_height</span><span class="p">,</span> <span class="n">img_width</span><span class="p">),</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">class_mode</span><span class="o">=</span><span class="s">'categorical'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Our generated and prepared data is ready, time to start training. Thr training will take quite long time.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit_generator</span><span class="p">(</span><span class="n">train_generator</span><span class="p">,</span> <span class="n">samples_per_epoch</span><span class="o">=</span><span class="n">samples_per_epoch</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span>
+    <span class="n">validation_data</span><span class="o">=</span><span class="n">validation_generator</span><span class="p">,</span> <span class="n">validation_steps</span><span class="o">=</span><span class="n">validation_steps</span><span class="p">)</span>
+</code></pre></div></div>
+<p>To see how our model was doing during its training, we plot the accuracy and loss function value in each iteration.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">print</span><span class="p">(</span><span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="c1"># "Accuracy"
+</span>    <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'acc'</span><span class="p">])</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_acc'</span><span class="p">])</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'model accuracy'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'accuracy'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'epoch'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">([</span><span class="s">'train'</span><span class="p">,</span> <span class="s">'validation'</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s">'upper left'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="/img/posts/sign-cnn/accuracy.png" alt="cnn accuracy" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="c1"># "Loss"
+</span>    <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'loss'</span><span class="p">])</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_loss'</span><span class="p">])</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'model loss'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'loss'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'epoch'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">([</span><span class="s">'train'</span><span class="p">,</span> <span class="s">'validation'</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s">'upper left'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="/img/posts/sign-cnn/loss.png" alt="cnn loss" /></p>
+
+<p>Training is done! and now our model is a master at recognizing sign language digits. in terms of numbers, We achieved the following scores for two different architectures.</p>
+
+<p><strong>LeNet</strong></p>
+
+<p>Training set :</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">loss</span><span class="p">:</span> <span class="mf">0.0320</span> <span class="o">-</span> <span class="n">accuracy</span><span class="p">:</span> <span class="mf">0.9909</span>  
+</code></pre></div></div>
+<p>Validation set :</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">loss</span><span class="p">:</span> <span class="mf">0.9061</span> <span class="o">-</span> <span class="n">accuracy</span><span class="p">:</span> <span class="mf">0.737</span>
+</code></pre></div></div>
+
+<p><strong>Deep CNN</strong></p>
+
+<p>Training set :</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">loss</span><span class="p">:</span> <span class="mf">0.0331</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.9950</span>  
+</code></pre></div></div>
+<p>Validation set :</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">loss</span><span class="p">:</span> <span class="mf">0.5674</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.835</span>
+</code></pre></div></div>
+
+<p>Time to save our model!</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="c1">#Save the model 
+</span>    <span class="n">model_json</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">to_json</span><span class="p">()</span>
+    <span class="nb">open</span><span class="p">(</span><span class="s">'signs-cnn.json'</span><span class="p">,</span> <span class="s">'w'</span><span class="p">).</span><span class="n">write</span><span class="p">(</span><span class="n">model_json</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">.</span><span class="n">save_weights</span><span class="p">(</span><span class="s">'signs-weights.h5'</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Our model is trained and saved. Now, we can load it and use it to recognize sign language digits from the unseen example. First, we load it again. ( this step is just to show you how to save your model later for production).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">example_data_path</span> <span class="o">=</span> <span class="s">'Examples/'</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">file_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="p">.</span><span class="n">glob</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">example_data_path</span><span class="p">,</span> <span class="s">'*.jpg'</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">img</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">file_paths</span><span class="p">):</span> 
+    <span class="n">image</span> <span class="o">=</span> <span class="n">misc</span><span class="p">.</span><span class="n">imread</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">figure</span><span class="p">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict_classes</span><span class="p">(</span><span class="n">image</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">real</span> <span class="o">=</span> <span class="n">path</span><span class="p">.</span><span class="n">basename</span><span class="p">(</span><span class="n">img</span><span class="p">)[</span><span class="mi">8</span><span class="p">]</span>
+    <span class="n">predicted</span> <span class="o">=</span> <span class="n">predictions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="s">'Real : '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">real</span><span class="p">)</span> <span class="o">+</span> <span class="s">' Predicted: '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">predicted</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="/img/posts/sign-cnn/results.png" alt="cnn results" /></p>
+
+<h2 id="results">Results</h2>
+
+<p>The deep CNN model successfully recognizes all sign language digits scoring 10 of 10 as we can see from the picture above. LeNet architecture did pretty well too, but it missed the digit ‘4’, LeNet was giving label 6 to a digit 4, its scores 9 of 10.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That’s it! I was so glad to put this post together and share with you. I hope it will give you an idea of how powerful convolution neural networks are in image recognition. The trained model (or similar models) can be used in a mobile app that uses the camera for capturing real-time hand signs and displays the corresponding digit, see an example here done by the creator of the used dataset.</p>
+
+:ET
