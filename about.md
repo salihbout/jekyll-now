@@ -7,7 +7,7 @@ permalink: /about/
 
 ## Me
 
-I’m a Data Scientist at [React & Share](https://reactandshare.com/) , with a background in Business Intelligence and Software Engineering. 
+I’m a Data Scientist at [DAIN Studios](https://dainstudios.com/), with a background in Business Intelligence and Software Engineering. 
 I love designing, analyzing, breaking and building things. I hold a Master degree in Software Engineering from Wuhan University in China, and I graduated as a computer science engineer from the National Institut Of Statistics and Applied Economics in Morocco.
 
 I have huge interest in building innovative solutions, leveraging the power of machine learning, and serving data driven solutions following the best practices.
@@ -33,7 +33,14 @@ As a result of my never ending curiosity, I have practical experience with a wid
   Machine Learning • Data Visualization •  Advanced Analytics •  Statistics and Probability • Software Engineering • Distributed/Cloud Computing • Web Application Development.
   
 
-## Certificates I’ve completed
+## Certificates :
+
+
+[![png](/img/certs/AWS-SAA-CO2.png)](https://www.credly.com/badges/24b602c2-192d-413e-b398-e5dac70f9cf0)
+
+
+
+## MOOCs I’ve completed :
 
 * Deep Learning Specialization by deeplearning.ai [Certificate](https://www.coursera.org/account/accomplishments/specialization/2FVXQAY9Z4AR)
 * Applied Data Science with Python by University of Michigan [Certificate](https://www.coursera.org/account/accomplishments/verify/S48FHQP8997G)
