@@ -5,7 +5,7 @@ permalink: /Miscellaneous/
 ---
 
 
-I was born and raised in Morocco, and lived in Oman, China and Finland. Currenly I'm based in Germany and married to the most beautiful, smart and brilliant women in the world.
+I was born and raised in Morocco, and lived in Oman, China and Finland. I'm currenly based in Germany and married to the most beautiful in the world.
 
 
 # Interests 

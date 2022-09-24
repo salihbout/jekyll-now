@@ -14,7 +14,7 @@ I have huge interest in building innovative solutions, leveraging the power of m
 
 I'm the founder of [Data Maroc](https://www.datamaroc.com), a community of Moroccan data enthusiasts, where I also host a podcast about data science topics. 
 
-I organize [PyData Helsinki Meetups](https://www.meetup.com/PyDataHelsinki) with the help of awesome collegues.
+I used to organize [PyData Helsinki Meetups](https://www.meetup.com/PyDataHelsinki) with the help of awesome collegues.
 
 ## What I know
 
