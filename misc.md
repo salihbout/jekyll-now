@@ -1,14 +1,12 @@
 ---
 layout: page
-title: Miscellaneous
-permalink: /Miscellaneous/
+# title: Misc.
+permalink: /misc/
 ---
 
+# Interests 
 
 I was born and raised in Morocco, and lived in Oman, China and Finland. Currenly I'm based in Germany and married to the most beautiful women in the world. In our free time, we enjoy traveling, exercising and enjoying walks in the nature.
-
-
-# Interests 
 
 ## Traveling 
 
