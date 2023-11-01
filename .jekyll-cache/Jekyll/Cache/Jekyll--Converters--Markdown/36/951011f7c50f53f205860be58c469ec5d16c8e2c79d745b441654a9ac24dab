@@ -1,2 +1,0 @@
-I"�<p>In this tutorial, we will design and implement a deep learning model that learns to recognize digits from sign language. We will be using a convolution neural network built using Keras API and trained on the <a href="https://github.com/ardamavi/Sign-Language-Digits-Dataset">Turkey Ankara Ayrancı Anadolu High School’s Sign Language Digits Dataset</a>. Many thanks to Arda Mavi for sharing this dataset.</p>
-:ET
