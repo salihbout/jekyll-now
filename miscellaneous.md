@@ -5,7 +5,7 @@ permalink: /Miscellaneous/
 ---
 
 
-I was born and raised in Morocco, and lived in Oman, China and Finland. I'm currenly based in Germany and married to the most beautiful women in the world. In our free time, we enjoy traveling, exercising and enjoying walks in the nature.
+I was born and raised in Morocco, and lived in Oman, China and Finland. Currenly I'm based in Germany and married to the most beautiful women in the world. In our free time, we enjoy traveling, exercising and enjoying walks in the nature.
 
 
 # Interests 
@@ -14,7 +14,7 @@ I was born and raised in Morocco, and lived in Oman, China and Finland. I'm curr
 
 I enjoy traveling and discovering new places with my partner, I have been to 28 country so far and counting ...
 
-![png](/img/misc/map.png)
+{% include map.html %}
 
 
 ## Trance music

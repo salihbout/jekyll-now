@@ -1,4 +1,4 @@
-I"��,<p>In the history of engineering and machine learning, choosing transparent models that are interpretable for humans or end-users is essential. Practically, it means using transparent data sources and simple and easy to interpret models like linear models and decision trees or even rule-based systems despite of their limitations due to real-world scenarios where observations are nonlinear and very specific. With the massive growth of machine learning and deep learning popularity, models complexity, and the spread of AI in all fields, it has became crucial to have approaches and mechanisms to explain models and interpret accurate and inaccurate predictions.</p>
+I"�-<p>In the history of engineering and machine learning, choosing transparent models that are interpretable for humans or end-users is essential. Practically, it means using transparent data sources and simple and easy to interpret models like linear models and decision trees or even rule-based systems despite of their limitations due to real-world scenarios where observations are nonlinear and very specific. With the massive growth of machine learning and deep learning popularity, models complexity, and the spread of AI in all fields, it has became crucial to have approaches and mechanisms to explain models and interpret accurate and inaccurate predictions.</p>
 
 <h2 id="motivations"><strong>Motivations</strong></h2>
 
@@ -49,21 +49,21 @@
 <p>In real world healthcare applications, using a black-box model to diagnose a serious disease is always challenging. Every prediction should be understood to be trusted. As a practical example, we will try to explain a Random Forrest model, that predicts whether having a heart disease or not, using couple of techniques through investigating how different features affect models predictions. We will start with a global model interpretation with SHAP to have an intuitive overall understanding of the model, then dive to some local interpretations using SHAP and LIME to examine some predictions.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Imports for plotting and data manipulation
-</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+</span><span class="kn">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="n">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+<span class="kn">import</span> <span class="n">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
 
 <span class="c1"># Imports for modeling and evaluation
-</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RandomizedSearchCV</span><span class="p">,</span> <span class="n">GridSearchCV</span>
-<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+</span><span class="kn">from</span> <span class="n">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="n">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RandomizedSearchCV</span><span class="p">,</span> <span class="n">GridSearchCV</span>
+<span class="kn">from</span> <span class="n">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span>
+<span class="kn">from</span> <span class="n">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
 </code></pre></div></div>
 
 <p>First, the dataset we are using can be found <a href="https://www.kaggle.com/ronitf/heart-disease-uci">here</a>. It contains 14 feature to predict whether a patient has a heart disease .</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'data/heart.csv'</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">read_csv</span><span class="p">(</span><span class="sh">'</span><span class="s">data/heart.csv</span><span class="sh">'</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p>The following are the defintion of each variable in the used dataset.</p>
@@ -88,58 +88,58 @@
 <p>Let’s convert each values with its actual description.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">SEX_MAP</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">0</span> <span class="p">:</span> <span class="s">'female'</span><span class="p">,</span>
-    <span class="mi">1</span> <span class="p">:</span> <span class="s">'male'</span>
+    <span class="mi">0</span> <span class="p">:</span> <span class="sh">'</span><span class="s">female</span><span class="sh">'</span><span class="p">,</span>
+    <span class="mi">1</span> <span class="p">:</span> <span class="sh">'</span><span class="s">male</span><span class="sh">'</span>
 <span class="p">}</span>
 
 <span class="n">CHEST_PAIN_MAP</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">1</span> <span class="p">:</span> <span class="s">'typical angina'</span><span class="p">,</span>
-    <span class="mi">2</span> <span class="p">:</span> <span class="s">'atypical angina'</span><span class="p">,</span>
-    <span class="mi">3</span> <span class="p">:</span> <span class="s">'non-anginal pain'</span><span class="p">,</span>
-    <span class="mi">0</span> <span class="p">:</span> <span class="s">'asymptomatic'</span>
+    <span class="mi">1</span> <span class="p">:</span> <span class="sh">'</span><span class="s">typical angina</span><span class="sh">'</span><span class="p">,</span>
+    <span class="mi">2</span> <span class="p">:</span> <span class="sh">'</span><span class="s">atypical angina</span><span class="sh">'</span><span class="p">,</span>
+    <span class="mi">3</span> <span class="p">:</span> <span class="sh">'</span><span class="s">non-anginal pain</span><span class="sh">'</span><span class="p">,</span>
+    <span class="mi">0</span> <span class="p">:</span> <span class="sh">'</span><span class="s">asymptomatic</span><span class="sh">'</span>
 <span class="p">}</span>
 
 <span class="n">FASTING_BLOOD_SUGAR_MAP</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">0</span> <span class="p">:</span> <span class="s">'lower than 120mg/ml'</span><span class="p">,</span>
-    <span class="mi">1</span> <span class="p">:</span> <span class="s">'greater than 120mg/ml'</span>
+    <span class="mi">0</span> <span class="p">:</span> <span class="sh">'</span><span class="s">lower than 120mg/ml</span><span class="sh">'</span><span class="p">,</span>
+    <span class="mi">1</span> <span class="p">:</span> <span class="sh">'</span><span class="s">greater than 120mg/ml</span><span class="sh">'</span>
 <span class="p">}</span>
 
 <span class="n">REST_ECG_MAP</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">0</span> <span class="p">:</span> <span class="s">'normal'</span><span class="p">,</span>
-    <span class="mi">1</span> <span class="p">:</span> <span class="s">'ST-T wave abnormality'</span><span class="p">,</span>
-    <span class="mi">2</span> <span class="p">:</span> <span class="s">'left ventricular hypertrophy'</span>
+    <span class="mi">0</span> <span class="p">:</span> <span class="sh">'</span><span class="s">normal</span><span class="sh">'</span><span class="p">,</span>
+    <span class="mi">1</span> <span class="p">:</span> <span class="sh">'</span><span class="s">ST-T wave abnormality</span><span class="sh">'</span><span class="p">,</span>
+    <span class="mi">2</span> <span class="p">:</span> <span class="sh">'</span><span class="s">left ventricular hypertrophy</span><span class="sh">'</span>
 <span class="p">}</span>
 
 <span class="n">EXERCISE_INDUCED_ANGINA_MAP</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">0</span> <span class="p">:</span> <span class="s">'no'</span><span class="p">,</span>
-    <span class="mi">1</span> <span class="p">:</span> <span class="s">'yes'</span>
+    <span class="mi">0</span> <span class="p">:</span> <span class="sh">'</span><span class="s">no</span><span class="sh">'</span><span class="p">,</span>
+    <span class="mi">1</span> <span class="p">:</span> <span class="sh">'</span><span class="s">yes</span><span class="sh">'</span>
 <span class="p">}</span>
 
 <span class="n">ST_SLOPE_MAP</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">2</span> <span class="p">:</span> <span class="s">'upsloping'</span><span class="p">,</span>
-    <span class="mi">1</span> <span class="p">:</span> <span class="s">'flat'</span><span class="p">,</span>
-    <span class="mi">0</span> <span class="p">:</span> <span class="s">'downsloping'</span>
+    <span class="mi">2</span> <span class="p">:</span> <span class="sh">'</span><span class="s">upsloping</span><span class="sh">'</span><span class="p">,</span>
+    <span class="mi">1</span> <span class="p">:</span> <span class="sh">'</span><span class="s">flat</span><span class="sh">'</span><span class="p">,</span>
+    <span class="mi">0</span> <span class="p">:</span> <span class="sh">'</span><span class="s">downsloping</span><span class="sh">'</span>
 <span class="p">}</span>
 
 <span class="n">THALASSEMIA_MAP</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">1</span> <span class="p">:</span> <span class="s">'normal'</span><span class="p">,</span>
-    <span class="mi">2</span> <span class="p">:</span> <span class="s">'fixed defect'</span><span class="p">,</span>
-    <span class="mi">3</span> <span class="p">:</span> <span class="s">'reversable defect'</span>
+    <span class="mi">1</span> <span class="p">:</span> <span class="sh">'</span><span class="s">normal</span><span class="sh">'</span><span class="p">,</span>
+    <span class="mi">2</span> <span class="p">:</span> <span class="sh">'</span><span class="s">fixed defect</span><span class="sh">'</span><span class="p">,</span>
+    <span class="mi">3</span> <span class="p">:</span> <span class="sh">'</span><span class="s">reversable defect</span><span class="sh">'</span>
 <span class="p">}</span>
 
-<span class="n">data</span><span class="p">[</span><span class="s">'sex'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">sex</span><span class="p">.</span><span class="nb">map</span><span class="p">(</span><span class="n">SEX_MAP</span><span class="p">).</span><span class="n">astype</span><span class="p">(</span><span class="s">'object'</span><span class="p">)</span>
-<span class="n">data</span><span class="p">[</span><span class="s">'cp'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">cp</span><span class="p">.</span><span class="nb">map</span><span class="p">(</span><span class="n">CHEST_PAIN_MAP</span><span class="p">).</span><span class="n">astype</span><span class="p">(</span><span class="s">'object'</span><span class="p">)</span>
-<span class="n">data</span><span class="p">[</span><span class="s">'fbs'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">fbs</span><span class="p">.</span><span class="nb">map</span><span class="p">(</span><span class="n">FASTING_BLOOD_SUGAR_MAP</span><span class="p">).</span><span class="n">astype</span><span class="p">(</span><span class="s">'object'</span><span class="p">)</span>
-<span class="n">data</span><span class="p">[</span><span class="s">'restecg'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">restecg</span><span class="p">.</span><span class="nb">map</span><span class="p">(</span><span class="n">REST_ECG_MAP</span><span class="p">).</span><span class="n">astype</span><span class="p">(</span><span class="s">'object'</span><span class="p">)</span>
-<span class="n">data</span><span class="p">[</span><span class="s">'exang'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">exang</span><span class="p">.</span><span class="nb">map</span><span class="p">(</span><span class="n">EXERCISE_INDUCED_ANGINA_MAP</span><span class="p">).</span><span class="n">astype</span><span class="p">(</span><span class="s">'object'</span><span class="p">)</span>
-<span class="n">data</span><span class="p">[</span><span class="s">'slope'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">slope</span><span class="p">.</span><span class="nb">map</span><span class="p">(</span><span class="n">ST_SLOPE_MAP</span><span class="p">).</span><span class="n">astype</span><span class="p">(</span><span class="s">'object'</span><span class="p">)</span>
-<span class="n">data</span><span class="p">[</span><span class="s">'thal'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">thal</span><span class="p">.</span><span class="nb">map</span><span class="p">(</span><span class="n">THALASSEMIA_MAP</span><span class="p">).</span><span class="n">astype</span><span class="p">(</span><span class="s">'object'</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="sh">'</span><span class="s">sex</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">sex</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="n">SEX_MAP</span><span class="p">).</span><span class="nf">astype</span><span class="p">(</span><span class="sh">'</span><span class="s">object</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="sh">'</span><span class="s">cp</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">cp</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="n">CHEST_PAIN_MAP</span><span class="p">).</span><span class="nf">astype</span><span class="p">(</span><span class="sh">'</span><span class="s">object</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="sh">'</span><span class="s">fbs</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">fbs</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="n">FASTING_BLOOD_SUGAR_MAP</span><span class="p">).</span><span class="nf">astype</span><span class="p">(</span><span class="sh">'</span><span class="s">object</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="sh">'</span><span class="s">restecg</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">restecg</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="n">REST_ECG_MAP</span><span class="p">).</span><span class="nf">astype</span><span class="p">(</span><span class="sh">'</span><span class="s">object</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="sh">'</span><span class="s">exang</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">exang</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="n">EXERCISE_INDUCED_ANGINA_MAP</span><span class="p">).</span><span class="nf">astype</span><span class="p">(</span><span class="sh">'</span><span class="s">object</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="sh">'</span><span class="s">slope</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">slope</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="n">ST_SLOPE_MAP</span><span class="p">).</span><span class="nf">astype</span><span class="p">(</span><span class="sh">'</span><span class="s">object</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="sh">'</span><span class="s">thal</span><span class="sh">'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">thal</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="n">THALASSEMIA_MAP</span><span class="p">).</span><span class="nf">astype</span><span class="p">(</span><span class="sh">'</span><span class="s">object</span><span class="sh">'</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p>We can have an all-in-one plot to show the relationship between all variables and target outcome.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sns</span><span class="p">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sns</span><span class="p">.</span><span class="nf">pairplot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">show</span><span class="p">()</span>
 </code></pre></div></div>
 
 <p><img src="/img/posts/interpret-ml/output_12_0.png" alt="png" /></p>
@@ -147,29 +147,29 @@
 <p>The next few cells execute the usual machine learning process, preparing the data, finetune paramters using randomized grid search and use the best model to be evaluated on the test dataset.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Data preprocessing and preparation
-</span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="s">'target'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">Y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">'target'</span><span class="p">]</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="p">.</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> <span class="c1">#split the data
+</span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">get_dummies</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="nf">drop</span><span class="p">(</span><span class="sh">'</span><span class="s">target</span><span class="sh">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="sh">'</span><span class="s">target</span><span class="sh">'</span><span class="p">]</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="nf">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="p">.</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> <span class="c1">#split the data
 </span></code></pre></div></div>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Hyperparameters tuning
-</span><span class="n">max_features</span> <span class="o">=</span> <span class="p">[</span><span class="s">'auto'</span><span class="p">,</span> <span class="s">'sqrt'</span><span class="p">]</span>
-<span class="n">max_depth</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)]</span>
-<span class="n">max_depth</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+</span><span class="n">max_features</span> <span class="o">=</span> <span class="p">[</span><span class="sh">'</span><span class="s">auto</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">sqrt</span><span class="sh">'</span><span class="p">]</span>
+<span class="n">max_depth</span> <span class="o">=</span> <span class="p">[</span><span class="nf">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">np</span><span class="p">.</span><span class="nf">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)]</span>
+<span class="n">max_depth</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
 <span class="n">min_samples_split</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
 <span class="n">min_samples_leaf</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
 <span class="n">bootstrap</span> <span class="o">=</span> <span class="p">[</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">]</span>
 <span class="n">random_grid</span> <span class="o">=</span> <span class="p">{</span>
-               <span class="s">'max_features'</span><span class="p">:</span> <span class="n">max_features</span><span class="p">,</span>
-               <span class="s">'max_depth'</span><span class="p">:</span> <span class="n">max_depth</span><span class="p">,</span>
-               <span class="s">'min_samples_split'</span><span class="p">:</span> <span class="n">min_samples_split</span><span class="p">,</span>
-               <span class="s">'min_samples_leaf'</span><span class="p">:</span> <span class="n">min_samples_leaf</span><span class="p">,</span>
-               <span class="s">'bootstrap'</span><span class="p">:</span> <span class="n">bootstrap</span><span class="p">}</span>
+               <span class="sh">'</span><span class="s">max_features</span><span class="sh">'</span><span class="p">:</span> <span class="n">max_features</span><span class="p">,</span>
+               <span class="sh">'</span><span class="s">max_depth</span><span class="sh">'</span><span class="p">:</span> <span class="n">max_depth</span><span class="p">,</span>
+               <span class="sh">'</span><span class="s">min_samples_split</span><span class="sh">'</span><span class="p">:</span> <span class="n">min_samples_split</span><span class="p">,</span>
+               <span class="sh">'</span><span class="s">min_samples_leaf</span><span class="sh">'</span><span class="p">:</span> <span class="n">min_samples_leaf</span><span class="p">,</span>
+               <span class="sh">'</span><span class="s">bootstrap</span><span class="sh">'</span><span class="p">:</span> <span class="n">bootstrap</span><span class="p">}</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">()</span>
-<span class="n">random_search</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">param_distributions</span><span class="o">=</span><span class="n">random_grid</span><span class="p">,</span> <span class="n">cv</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s">'roc_auc'</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
-<span class="n">random_search</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="nc">RandomForestClassifier</span><span class="p">()</span>
+<span class="n">random_search</span> <span class="o">=</span> <span class="nc">RandomizedSearchCV</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">param_distributions</span><span class="o">=</span><span class="n">random_grid</span><span class="p">,</span> <span class="n">cv</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="sh">'</span><span class="s">roc_auc</span><span class="sh">'</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">random_search</span><span class="p">.</span><span class="nf">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 </code></pre></div></div>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>RandomizedSearchCV(cv=3, estimator=RandomForestClassifier(), n_iter=100,
@@ -187,34 +187,34 @@
 </span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">random_search</span><span class="p">.</span><span class="n">best_estimator_</span>
 
-<span class="n">sns</span><span class="p">.</span><span class="nb">set</span><span class="p">()</span>
-<span class="n">y_train_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
-<span class="n">y_test_prob</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[:,</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">y_test_pred</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_test_prob</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">roc_auc</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">.</span><span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_prob</span><span class="p">)</span>
+<span class="n">sns</span><span class="p">.</span><span class="nf">set</span><span class="p">()</span>
+<span class="n">y_train_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">y_test_prob</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[:,</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">y_test_pred</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="n">y_test_prob</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">roc_auc</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">.</span><span class="nf">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_prob</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="s">'both'</span><span class="p">,</span> <span class="n">which</span> <span class="o">=</span> <span class="s">'major'</span><span class="p">,</span> <span class="n">labelsize</span> <span class="o">=</span> <span class="mi">12</span><span class="p">)</span>
-<span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">.</span><span class="n">roc_curve</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_prob</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'ROC curve (area = %0.2f)'</span> <span class="o">%</span> <span class="n">roc_auc</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s">'k--'</span><span class="p">)</span>  <span class="c1"># coin toss line
-</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'False Positive Rate'</span><span class="p">,</span> <span class="n">fontsize</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'True Positive Rate'</span><span class="p">,</span> <span class="n">fontsize</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">xlim</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">"lower right"</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">tick_params</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="sh">'</span><span class="s">both</span><span class="sh">'</span><span class="p">,</span> <span class="n">which</span> <span class="o">=</span> <span class="sh">'</span><span class="s">major</span><span class="sh">'</span><span class="p">,</span> <span class="n">labelsize</span> <span class="o">=</span> <span class="mi">12</span><span class="p">)</span>
+<span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">.</span><span class="nf">roc_curve</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_prob</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">plot</span><span class="p">(</span><span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sh">'</span><span class="s">ROC curve (area = %0.2f)</span><span class="sh">'</span> <span class="o">%</span> <span class="n">roc_auc</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="sh">'</span><span class="s">k--</span><span class="sh">'</span><span class="p">)</span>  <span class="c1"># coin toss line
+</span><span class="n">plt</span><span class="p">.</span><span class="nf">xlabel</span><span class="p">(</span><span class="sh">'</span><span class="s">False Positive Rate</span><span class="sh">'</span><span class="p">,</span> <span class="n">fontsize</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">ylabel</span><span class="p">(</span><span class="sh">'</span><span class="s">True Positive Rate</span><span class="sh">'</span><span class="p">,</span> <span class="n">fontsize</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">xlim</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">ylim</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="sh">"</span><span class="s">lower right</span><span class="sh">"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">show</span><span class="p">()</span>
 
-<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\t</span><span class="s">Accuracy_train:  %.4f</span><span class="se">\t\t</span><span class="s">Accuracy_test:   %.4f'</span> <span class="o">%</span>\
-                <span class="p">(</span><span class="n">metrics</span><span class="p">.</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_train_pred</span><span class="p">),</span>\
-                 <span class="n">metrics</span><span class="p">.</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)))</span>
-<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\t</span><span class="s">Precision_test:  %.4f</span><span class="se">\t\t</span><span class="s">Recall_test:     %.4f'</span> <span class="o">%</span>\
-                <span class="p">(</span><span class="n">metrics</span><span class="p">.</span><span class="n">precision_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">),</span>\
-                 <span class="n">metrics</span><span class="p">.</span><span class="n">recall_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)))</span>
-<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\t</span><span class="s">ROC-AUC_test:    %.4f</span><span class="se">\t\t</span><span class="s">F1_test:         %.4f</span><span class="se">\t\t</span><span class="s">MCC_test: %.4f'</span> <span class="o">%</span>\
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="se">\t</span><span class="s">Accuracy_train:  %.4f</span><span class="se">\t\t</span><span class="s">Accuracy_test:   %.4f</span><span class="sh">'</span> <span class="o">%</span>\
+                <span class="p">(</span><span class="n">metrics</span><span class="p">.</span><span class="nf">accuracy_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_train_pred</span><span class="p">),</span>\
+                 <span class="n">metrics</span><span class="p">.</span><span class="nf">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)))</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="se">\t</span><span class="s">Precision_test:  %.4f</span><span class="se">\t\t</span><span class="s">Recall_test:     %.4f</span><span class="sh">'</span> <span class="o">%</span>\
+                <span class="p">(</span><span class="n">metrics</span><span class="p">.</span><span class="nf">precision_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">),</span>\
+                 <span class="n">metrics</span><span class="p">.</span><span class="nf">recall_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)))</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="se">\t</span><span class="s">ROC-AUC_test:    %.4f</span><span class="se">\t\t</span><span class="s">F1_test:         %.4f</span><span class="se">\t\t</span><span class="s">MCC_test: %.4f</span><span class="sh">'</span> <span class="o">%</span>\
                 <span class="p">(</span><span class="n">roc_auc</span><span class="p">,</span>\
-                 <span class="n">metrics</span><span class="p">.</span><span class="n">f1_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">),</span>\
-                 <span class="n">metrics</span><span class="p">.</span><span class="n">matthews_corrcoef</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)))</span>
+                 <span class="n">metrics</span><span class="p">.</span><span class="nf">f1_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">),</span>\
+                 <span class="n">metrics</span><span class="p">.</span><span class="nf">matthews_corrcoef</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)))</span>
 </code></pre></div></div>
 
 <p><img src="/img/posts/interpret-ml/output_16_0.png" alt="png" /></p>
@@ -232,14 +232,14 @@
 
 <p>As our model in Tree-based, we will use TreeExplainer to explain our model’s predictions.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">shap</span>  
-<span class="n">explainer</span> <span class="o">=</span> <span class="n">shap</span><span class="p">.</span><span class="n">TreeExplainer</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-<span class="n">shap_values</span> <span class="o">=</span> <span class="n">explainer</span><span class="p">.</span><span class="n">shap_values</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">shap</span>  
+<span class="n">explainer</span> <span class="o">=</span> <span class="n">shap</span><span class="p">.</span><span class="nc">TreeExplainer</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<span class="n">shap_values</span> <span class="o">=</span> <span class="n">explainer</span><span class="p">.</span><span class="nf">shap_values</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p>We start with a general feature importance to measure the magnitude of feature attributions and it’s measured as the mean absolute of Shapley values.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shap</span><span class="p">.</span><span class="n">summary_plot</span><span class="p">(</span><span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">plot_type</span><span class="o">=</span><span class="s">"bar"</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shap</span><span class="p">.</span><span class="nf">summary_plot</span><span class="p">(</span><span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">plot_type</span><span class="o">=</span><span class="sh">"</span><span class="s">bar</span><span class="sh">"</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p><img src="/img/posts/interpret-ml/output_23_0.png" alt="png" /></p>
@@ -247,21 +247,21 @@
 <p>The number of major vessels seems to be the most important features, changing the predicted absolute heart disease probability on average by 13%. To get more details beyond importrance, let’s look at the SHAP summary Plot. It combines features importance and their effects on each instance.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#We can use a `summary_plot` to plot our Shapely Values for class `1`
-</span><span class="n">shap</span><span class="p">.</span><span class="n">summary_plot</span><span class="p">(</span><span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_test</span><span class="p">)</span>
+</span><span class="n">shap</span><span class="p">.</span><span class="nf">summary_plot</span><span class="p">(</span><span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_test</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p><img src="/img/posts/interpret-ml/output_25_0.png" alt="png" /></p>
 
 <p>We can clearly see that many features separate cases with or without heart disease. For example, having a low number of major vessels, being a female, having a The reversable defect thalassemia, having a flat slope of the peak exercice ST segment, is more likely to increase the probability  and the risk of having a heart disease. However, keep in mind that these effects describing the model are not necessary casual in the real world.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shap</span><span class="p">.</span><span class="n">dependence_plot</span><span class="p">(</span><span class="s">'ca'</span><span class="p">,</span> <span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">interaction_index</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shap</span><span class="p">.</span><span class="nf">dependence_plot</span><span class="p">(</span><span class="sh">'</span><span class="s">ca</span><span class="sh">'</span><span class="p">,</span> <span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">interaction_index</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p><img src="/img/posts/interpret-ml/output_27_0.png" alt="png" /></p>
 
 <p>Again, A low number of major vessels is most likely to increase the risk of heart disease. Let’s add the feature with the strongest interaction with our most important feature.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shap</span><span class="p">.</span><span class="n">dependence_plot</span><span class="p">(</span><span class="s">'ca'</span><span class="p">,</span> <span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_test</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shap</span><span class="p">.</span><span class="nf">dependence_plot</span><span class="p">(</span><span class="sh">'</span><span class="s">ca</span><span class="sh">'</span><span class="p">,</span> <span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_test</span><span class="p">)</span>
 </code></pre></div></div>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Passing parameters norm and vmin/vmax simultaneously is deprecated since 3.3 and will become an error two minor releases later. Please pass vmin/vmax directly to the norm when creating it.
@@ -273,8 +273,8 @@
 
 <p>An other interesting SHAP plot is the force plot. It clusters similar instances using hierarchical agglomerative clustering. Each position on the x-axis is an instance of the data. Red SHAP values increase the prediction, blue values decrease it. We can hover over instance to see why each person ended up either positively or negatively diagnoseed with heart disease.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shap</span><span class="p">.</span><span class="n">initjs</span><span class="p">()</span>
-<span class="n">shap</span><span class="p">.</span><span class="n">force_plot</span><span class="p">(</span><span class="n">explainer</span><span class="p">.</span><span class="n">expected_value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_test</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shap</span><span class="p">.</span><span class="nf">initjs</span><span class="p">()</span>
+<span class="n">shap</span><span class="p">.</span><span class="nf">force_plot</span><span class="p">(</span><span class="n">explainer</span><span class="p">.</span><span class="n">expected_value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_test</span><span class="p">)</span>
 </code></pre></div></div>
 
 <div align="center"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAWCAYAAAA1vze2AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAdxJREFUeNq0Vt1Rg0AQJjcpgBJiBWIFkgoMFYhPPAIVECogPuYpdJBYgXQQrMCUkA50V7+d2ZwXuXPGm9khHLu3f9+3l1nkWNvtNqfHLgpfQ1EUS3tz5nAQ0+NIsiAZSc6eDlI8M3J00B/mDuUKDk6kfOebAgW3pkdD0pFcODGW4gKKvOrAUm04MA4QDt1OEIXU9hDigfS5rC1eS5T90gltck1Xrizo257kgySZcNRzgCSxCvgiE9nckPJo2b/B2AcEkk2OwL8bD8gmOKR1GPbaCUqxEgTq0tLvgb6zfo7+DgYGkkWL2tqLDV4RSITfbHPPfJKIrWz4nJQTMPAWA7IbD6imcNaDeDfgk+4No+wZr40BL3g9eQJJCFqRQ54KiSt72lsLpE3o3MCBSxDuq4yOckU2hKXRuwBH3OyMR4g1UpyTYw6mlmBqNdUXRM1NfyF5EPI6JkcpIDBIX8jX6DR/6ckAZJ0wEAdLR8DEk6OfC1Pp8BKo6TQIwPJbvJ6toK5lmuvJoRtfK6Ym1iRYIarRo2UyYHvRN5qpakR3yoizWrouoyuXXQqI185LCw07op5ZyCRGL99h24InP0e9xdQukEKVmhzrqZuRIfwISB//cP3Wk3f8f/yR+BRgAHu00HjLcEQBAAAAAElFTkSuQmCC" /></div>
@@ -332,11 +332,11 @@ n===t._wrapperState.initialValue&&(e.value=n)}});t.exports=l},function(t,e,n){"u
 <p>In the case of local interpretation, we can select couple of instances of interest, such as outliers or instances meeting a specific criteria. For our case, let’s select random 10 instance with some false negative points.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#Get indexes for a Group of Points
-</span><span class="n">sample_test_idx</span> <span class="o">=</span> <span class="n">X_test</span><span class="p">.</span><span class="n">index</span><span class="p">.</span><span class="n">get_indexer_for</span><span class="p">(</span><span class="n">X_test</span><span class="p">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">10</span><span class="p">).</span><span class="n">index</span><span class="p">)</span>
+</span><span class="n">sample_test_idx</span> <span class="o">=</span> <span class="n">X_test</span><span class="p">.</span><span class="n">index</span><span class="p">.</span><span class="nf">get_indexer_for</span><span class="p">(</span><span class="n">X_test</span><span class="p">.</span><span class="nf">sample</span><span class="p">(</span><span class="mi">10</span><span class="p">).</span><span class="n">index</span><span class="p">)</span>
 
 <span class="c1">#To highlight False Negatives from these points
 </span><span class="n">FN</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_test_pred</span><span class="p">[</span><span class="n">sample_test_idx</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>\
-     <span class="p">(</span><span class="n">y_test</span><span class="p">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">sample_test_idx</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">).</span><span class="n">to_numpy</span><span class="p">()</span> 
+     <span class="p">(</span><span class="n">y_test</span><span class="p">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">sample_test_idx</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">).</span><span class="nf">to_numpy</span><span class="p">()</span> 
 <span class="c1">#Set the expected value for the positive class
 </span><span class="n">expected_value</span> <span class="o">=</span> <span class="n">explainer</span><span class="p">.</span><span class="n">expected_value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
@@ -345,7 +345,7 @@ n===t._wrapperState.initialValue&&(e.value=n)}});t.exports=l},function(t,e,n){"u
 # plt.rcParams.update(orig_plt_params)
 </span>
 <span class="c1">#Display decision plot with FN highlighted
-</span><span class="n">shap</span><span class="p">.</span><span class="n">decision_plot</span><span class="p">(</span><span class="n">expected_value</span><span class="p">,</span> <span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">sample_test_idx</span><span class="p">],</span>\
+</span><span class="n">shap</span><span class="p">.</span><span class="nf">decision_plot</span><span class="p">(</span><span class="n">expected_value</span><span class="p">,</span> <span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">sample_test_idx</span><span class="p">],</span>\
                    <span class="n">X_test</span><span class="p">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">sample_test_idx</span><span class="p">],</span> <span class="n">highlight</span><span class="o">=</span><span class="n">FN</span><span class="p">)</span>
 </code></pre></div></div>
 
@@ -356,7 +356,7 @@ n===t._wrapperState.initialValue&&(e.value=n)}});t.exports=l},function(t,e,n){"u
 <p>We can look at a force plot for on instance of interest to have an idea about what weighted in the model’s decisions. let’s compare a positive and a negative case.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#positive case with heart disease
-</span><span class="n">shap</span><span class="p">.</span><span class="n">force_plot</span><span class="p">(</span><span class="n">expected_value</span><span class="p">,</span> <span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">X_test</span><span class="p">.</span><span class="n">index</span><span class="o">==</span><span class="mi">126</span><span class="p">],</span>\
+</span><span class="n">shap</span><span class="p">.</span><span class="nf">force_plot</span><span class="p">(</span><span class="n">expected_value</span><span class="p">,</span> <span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">X_test</span><span class="p">.</span><span class="n">index</span><span class="o">==</span><span class="mi">126</span><span class="p">],</span>\
                 <span class="n">X_test</span><span class="p">[</span><span class="n">X_test</span><span class="p">.</span><span class="n">index</span><span class="o">==</span><span class="mi">126</span><span class="p">])</span>
 </code></pre></div></div>
 
@@ -376,7 +376,7 @@ n===t._wrapperState.initialValue&&(e.value=n)}});t.exports=l},function(t,e,n){"u
 </script>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#negative case without heart disease
-</span><span class="n">shap</span><span class="p">.</span><span class="n">force_plot</span><span class="p">(</span><span class="n">expected_value</span><span class="p">,</span> <span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">X_test</span><span class="p">.</span><span class="n">index</span><span class="o">==</span><span class="mi">184</span><span class="p">],</span>\
+</span><span class="n">shap</span><span class="p">.</span><span class="nf">force_plot</span><span class="p">(</span><span class="n">expected_value</span><span class="p">,</span> <span class="n">shap_values</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">X_test</span><span class="p">.</span><span class="n">index</span><span class="o">==</span><span class="mi">184</span><span class="p">],</span>\
                 <span class="n">X_test</span><span class="p">[</span><span class="n">X_test</span><span class="p">.</span><span class="n">index</span><span class="o">==</span><span class="mi">184</span><span class="p">])</span>
 </code></pre></div></div>
 
@@ -399,18 +399,18 @@ n===t._wrapperState.initialValue&&(e.value=n)}});t.exports=l},function(t,e,n){"u
 
 <h1 id="local-intepretation-using-lime">Local Intepretation using LIME</h1>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">lime</span>
-<span class="kn">from</span> <span class="nn">lime.lime_tabular</span> <span class="kn">import</span> <span class="n">LimeTabularExplainer</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">lime</span>
+<span class="kn">from</span> <span class="n">lime.lime_tabular</span> <span class="kn">import</span> <span class="n">LimeTabularExplainer</span>
 
-<span class="n">explainer</span> <span class="o">=</span> <span class="n">lime</span><span class="p">.</span><span class="n">lime_tabular</span><span class="p">.</span><span class="n">LimeTabularExplainer</span><span class="p">(</span><span class="n">X_test</span><span class="p">.</span><span class="n">values</span><span class="p">,</span>\
+<span class="n">explainer</span> <span class="o">=</span> <span class="n">lime</span><span class="p">.</span><span class="n">lime_tabular</span><span class="p">.</span><span class="nc">LimeTabularExplainer</span><span class="p">(</span><span class="n">X_test</span><span class="p">.</span><span class="n">values</span><span class="p">,</span>\
                         <span class="n">feature_names</span><span class="o">=</span><span class="n">X_test</span><span class="p">.</span><span class="n">columns</span><span class="p">,</span> \
-                        <span class="n">class_names</span><span class="o">=</span><span class="p">[</span><span class="s">'Not Heart Disease'</span><span class="p">,</span> <span class="s">'Heart Disease'</span><span class="p">])</span>
+                        <span class="n">class_names</span><span class="o">=</span><span class="p">[</span><span class="sh">'</span><span class="s">Not Heart Disease</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">Heart Disease</span><span class="sh">'</span><span class="p">])</span>
 </code></pre></div></div>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#positive case with heart disease
-</span><span class="n">explainer</span><span class="p">.</span><span class="n">explain_instance</span><span class="p">(</span><span class="n">X_test</span><span class="p">[</span><span class="n">X_test</span><span class="p">.</span><span class="n">index</span><span class="o">==</span><span class="mi">10</span><span class="p">].</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>\
+</span><span class="n">explainer</span><span class="p">.</span><span class="nf">explain_instance</span><span class="p">(</span><span class="n">X_test</span><span class="p">[</span><span class="n">X_test</span><span class="p">.</span><span class="n">index</span><span class="o">==</span><span class="mi">10</span><span class="p">].</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>\
                                     <span class="n">model</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">num_features</span><span class="o">=</span><span class="mi">6</span><span class="p">).</span>\
-                                    <span class="n">show_in_notebook</span><span class="p">(</span><span class="n">predict_proba</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                                    <span class="nf">show_in_notebook</span><span class="p">(</span><span class="n">predict_proba</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </code></pre></div></div>
 
 <html>
@@ -37528,9 +37528,9 @@ n===t._wrapperState.initialValue&&(e.value=n)}});t.exports=l},function(t,e,n){"u
         </body></html>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># negative case without heart disease
-</span><span class="n">explainer</span><span class="p">.</span><span class="n">explain_instance</span><span class="p">(</span><span class="n">X_test</span><span class="p">[</span><span class="n">X_test</span><span class="p">.</span><span class="n">index</span><span class="o">==</span><span class="mi">219</span><span class="p">].</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>\
+</span><span class="n">explainer</span><span class="p">.</span><span class="nf">explain_instance</span><span class="p">(</span><span class="n">X_test</span><span class="p">[</span><span class="n">X_test</span><span class="p">.</span><span class="n">index</span><span class="o">==</span><span class="mi">219</span><span class="p">].</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>\
                                     <span class="n">model</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">num_features</span><span class="o">=</span><span class="mi">6</span><span class="p">).</span>\
-                                    <span class="n">show_in_notebook</span><span class="p">(</span><span class="n">predict_proba</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                                    <span class="nf">show_in_notebook</span><span class="p">(</span><span class="n">predict_proba</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </code></pre></div></div>
 
 <html>

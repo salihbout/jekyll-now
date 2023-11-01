@@ -7,7 +7,7 @@ permalink: /about/
 
 ## Me
 
-I’m a Data Scientist at [DAIN Studios](https://dainstudios.com/), with a background in Business Intelligence and Software Engineering. 
+I’m a Senior Data Scientist at [DAIN Studios](https://dainstudios.com/), with a background in Business Intelligence and Software Engineering. 
 I love designing, analyzing, breaking and building things. I hold a Master degree in Software Engineering from Wuhan University in China, and I graduated as a computer science engineer from the National Institut Of Statistics and Applied Economics in Morocco.
 
 I have huge interest in building innovative solutions, leveraging the power of machine learning, and serving data driven solutions following the best practices.
@@ -36,7 +36,7 @@ As a result of my never ending curiosity, I have practical experience with a wid
 ## Certificates :
 
 
-[![png](/img/certs/AWS-SAA-CO2.png)](https://www.credly.com/badges/24b602c2-192d-413e-b398-e5dac70f9cf0)
+[![png](/img/certs/Azure-DP100.png)](https://learn.microsoft.com/api/credentials/share/en-us/salihbout/555C43219EDD19B8?sharingId=8FE9B22AD8533882) | [![png](/img/certs/AWS-SAA-CO2.png)](https://www.credly.com/badges/24b602c2-192d-413e-b398-e5dac70f9cf0)
 
 
 
